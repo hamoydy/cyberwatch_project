@@ -24,7 +24,7 @@ def get_nvd_cves(keywords, max_results=10):
                 #results.append({"cve": cve_id, "description": desc, "cvss": score, "lastModified": last_modified_date, "publication": published_date ,"source": "NVD", "reference": refs})
 
                 # Filtrer les CVEs publiées à partir d'hier
-                plage_date = datetime.now() - timedelta(days=30)
+                plage_date = datetime.now() - timedelta(days=15)
                 
                 # Ajouter un filtre pour ne garder que les publications à partir d'hier
                 if last_modified_date >= plage_date:
