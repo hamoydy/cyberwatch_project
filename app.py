@@ -28,7 +28,7 @@ if os.path.exists(tracking_file):
 else:
     tracking_df = pd.DataFrame(columns=[
         "cve", "description", "reference", "cvss", "source", "produit_impacté",
-        "impacté", "traité", "date_patch", "responsable"
+        "impacté", "traité", "date_patch", "responsable", "lastModified", "publication"
     ])
 
 # 4. Ajouter les nouvelles CVE au suivi si elles n’y sont pas
