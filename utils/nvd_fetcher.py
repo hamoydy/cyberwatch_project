@@ -1,5 +1,6 @@
 import requests
 from datetime import datetime, timedelta
+import pandas as pd
 
 def get_nvd_cves(keywords, max_results=20):
     results = []
