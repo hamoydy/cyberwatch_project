@@ -10,7 +10,9 @@ def get_nvd_cves(keywords, max_results=20):
             for vuln in data.get("vulnerabilities", []):
                 cve_id = vuln["cve"]["id"]
                 published = vuln["cve"]["published"]
+                lastModified = vuln["cve"]["lastModified"]
                 desc = vuln["cve"]["descriptions"][0]["value"]
+                refs = vuln["cve"]["references"][0]["url"]
                 score = vuln["cve"].get("metrics", {}).get("cvssMetricV31", [{}])[0].get("cvssData", {}).get("baseScore", "N/A")
-                results.append({"cve": cve_id, "description": desc, "cvss": score, "publication": "published" ,"source": "NVD"})
+                results.append({"cve": cve_id, "description": desc, "cvss": score, "lastModified": lastModified, "publication": published ,"source": "NVD", "reference": refs})
     return results
