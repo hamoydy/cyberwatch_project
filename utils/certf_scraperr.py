@@ -1,7 +1,7 @@
 import requests
 import xml.etree.ElementTree as ET
 
-def fetch_cert_fr_alerts():
+def get_certfr_alerts():
     # URL du flux RSS du CERT-FR
     url = "https://www.cert.ssi.gouv.fr/feed/"
     
