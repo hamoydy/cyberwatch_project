@@ -19,7 +19,7 @@ st.sidebar.write(products)
 
 # 2. Fetch vulnerabilities
 with st.spinner("Chargement des vulnérabilités NVD..."):
-    nvd_vulns = get_nvd_cves(products, max_results=30)
+    nvd_vulns = get_nvd_cves(products, max_results=10)
     relevant_nvd_vulns = filter_vulns_by_products(nvd_vulns, products)
 
 # 3. Chargement ou initialisation du fichier de suivi
@@ -27,7 +27,7 @@ if os.path.exists(tracking_file):
     tracking_df = pd.read_csv(tracking_file)
 else:
     tracking_df = pd.DataFrame(columns=[
-        "cve", "description", "cvss", "source", "produit_impacté",
+        "cve", "description", "reference", "cvss", "source", "produit_impacté",
         "impacté", "traité", "date_patch", "responsable"
     ])
 
@@ -38,6 +38,8 @@ for vuln in relevant_nvd_vulns:
             "cve": vuln["cve"],
             "description": vuln["description"],
             "cvss": vuln["cvss"],
+            "lastModified" = vuln["lastModified"] 
+            "publication" = vuln["publication"]
             "source": vuln["source"],
             "produit_impacté": "",
             "impacté": "non",
