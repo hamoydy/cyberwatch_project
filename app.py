@@ -14,7 +14,7 @@ nvd_alerts = fetch_nvd_alerts()
 
 # Fusionner les alertes et dédupliquer
 all_alerts = cert_fr_alerts + nvd_alerts
-unique_alerts = deduplicate_alerts(all_alerts)
+vulns = deduplicate_alerts(all_alerts)
 
 # Convertir en DataFrame pour affichage
 #df_alerts = pd.DataFrame(unique_alerts)
@@ -48,7 +48,7 @@ def show_vulnerabilities(vulns):
                 st.success(f"Informations enregistrées pour {vuln['title']}")
 
 # Afficher le formulaire de suivi
-show_vulnerabilities(unique_alerts)
+show_vulnerabilities(vulns)
 
 # Afficher le tableau récapitulatif
 display_vulnerability_status()
