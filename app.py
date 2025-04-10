@@ -27,8 +27,8 @@ if os.path.exists(tracking_file):
     tracking_df = pd.read_csv(tracking_file)
 else:
     tracking_df = pd.DataFrame(columns=[
-        "cve", "description", "reference", "cvss", "source", "produit_impacté",
-        "impacté", "traité", "date_patch", "responsable", "lastModified", "publication"
+        "cve", "description", "cvss", "lastModified", "publication", "source", "reference", "produit_impacté",
+        "impacté", "traité", "date_patch", "responsable"
     ])
 
 # 4. Ajouter les nouvelles CVE au suivi si elles n’y sont pas
@@ -41,6 +41,7 @@ for vuln in relevant_nvd_vulns:
             "lastModified" = vuln["lastModified"],
             "publication" = vuln["publication"],
             "source": vuln["source"],
+            "reference": vuln["reference"]
             "produit_impacté": "",
             "impacté": "non",
             "traité": "non",
