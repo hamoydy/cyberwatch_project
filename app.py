@@ -72,7 +72,7 @@ def show_vulnerabilities(vulns):
 
 
 # Afficher le formulaire de suivi
-show_vulnerabilities(vulns)
+show_vulnerabilities(cert_fr_alerts)
 
 # Afficher le tableau récapitulatif
 display_vulnerability_status()
