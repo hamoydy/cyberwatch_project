@@ -14,3 +14,19 @@ Ce projet est une application de veille cybersécurité, permettant de collecter
 1. Clonez ce repo : 
    ```bash
    git clone https://github.com/votre-utilisateur/cyberwatch_project.git
+   
+2. Créez un environnement virtuel :
+     ```bash
+     python -m venv .venv
+     
+3. Activez l'environnement virtuel :
+      ```bash
+      .venv\Scripts\activate
+      
+4. Installez les dépendances :
+      ```bash
+      pip install -r requirements.txt
+      
+5. Lancez l'application
+      ```bash
+      streamlit run app/main.py
