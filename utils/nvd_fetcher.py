@@ -14,5 +14,10 @@ def get_nvd_cves(keywords, max_results=20):
                 desc = vuln["cve"]["descriptions"][0]["value"]
                 refs = vuln["cve"]["references"][0]["url"]
                 score = vuln["cve"].get("metrics", {}).get("cvssMetricV31", [{}])[0].get("cvssData", {}).get("baseScore", "N/A")
-                results.append({"cve": cve_id, "description": desc, "cvss": score, "lastModified": lastModified, "publication": published ,"source": "NVD", "reference": refs})
+                
+                # Convertir les dates en datetime, si elles sont valides
+                published_date = pd.to_datetime(published, errors='coerce')
+                last_modified_date = pd.to_datetime(lastModified, errors='coerce')
+
+                results.append({"cve": cve_id, "description": desc, "cvss": score, "lastModified": last_modified_date, "publication": published_date ,"source": "NVD", "reference": refs})
     return results
