@@ -41,7 +41,7 @@ for vuln in relevant_nvd_vulns:
             "lastModified": vuln["lastModified"],
             "publication": vuln["publication"],
             "source": vuln["source"],
-            "reference": vuln["reference"]
+            "reference": vuln["reference"],
             "produit_impacté": "",
             "impacté": "non",
             "traité": "non",
