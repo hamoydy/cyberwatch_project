@@ -2,3 +2,5 @@ streamlit
 feedparser
 requests
 pandas
+lxml
+beautifulsoup4
