@@ -27,8 +27,18 @@ if os.path.exists(tracking_file):
     tracking_df = pd.read_csv(tracking_file)
 else:
     tracking_df = pd.DataFrame(columns=[
-        "cve", "description", "cvss", "lastModified", "publication", "source", "reference", "produit_impacté",
-        "impacté", "traité", "date_patch", "responsable"
+        "cve", 
+        "description", 
+        "cvss", 
+        "lastModified", 
+        "publication", 
+        "source", 
+        "reference", 
+        "produit_impacté",
+        "impacté", 
+        "traité", 
+        "date_patch", 
+        "responsable"
     ])
 
 # 4. Ajouter les nouvelles CVE au suivi si elles n’y sont pas
@@ -58,9 +68,9 @@ for i, row in tracking_df.iterrows():
     with st.expander(f"{row['cve']} - {row['description'][:80]}..."):
         edited_df.at[i, "produit_impacté"] = st.text_input("Produit concerné", row["produit_impacté"], key=f"prod_{i}")
         edited_df.at[i, "impacté"] = st.selectbox("Impacté ?", ["oui", "non"], index=["oui", "non"].index(row["impacté"]), key=f"imp_{i}")
-        edited_df.at[i, "traité"] = st.selectbox("Traité ?", ["oui", "non"], index=["oui", "non"].index(row["traité"]), key=f"traite_{i}")
-        #edited_df.at[i, "date_patch"] = st.date_input("Date de patch", pd.to_datetime(row["date_patch"]) if row["date_patch"] else None, key=f"date_{i}")
-        edited_df.at[i, "date_patch"] = st.text_input("Date de patch", row["date_patch"], key=f"date_{i}")
+        edited_df.at[i, "traité"] = st.selectbox("Traité ?", ["oui", "non", "en cours"], index=["oui", "non"].index(row["traité"]), key=f"traite_{i}")
+        edited_df.at[i, "date_patch"] = st.date_input("Date de patch", pd.to_datetime(row["date_patch"]) if row["date_patch"] else None, key=f"date_{i}")
+        #edited_df.at[i, "date_patch"] = st.text_input("Date de patch", row["date_patch"], key=f"date_{i}")
         edited_df.at[i, "responsable"] = st.text_input("Responsable", row["responsable"], key=f"resp_{i}")
 
 # 6. Sauvegarde
