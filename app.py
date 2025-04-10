@@ -38,8 +38,8 @@ for vuln in relevant_nvd_vulns:
             "cve": vuln["cve"],
             "description": vuln["description"],
             "cvss": vuln["cvss"],
-            "lastModified" = vuln["lastModified"],
-            "publication" = vuln["publication"],
+            "lastModified": vuln["lastModified"],
+            "publication": vuln["publication"],
             "source": vuln["source"],
             "reference": vuln["reference"]
             "produit_impacté": "",
