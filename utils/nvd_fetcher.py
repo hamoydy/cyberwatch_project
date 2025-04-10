@@ -2,10 +2,10 @@ import requests
 from datetime import datetime, timedelta
 import pandas as pd
 
-def get_nvd_cves(keywords, max_results=10):
+def get_nvd_cves(keywords, max_results=5):
     results = []
     for keyword in keywords:
-        url = f"https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch={keyword}&resultsPerPage=10"
+        url = f"https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch={keyword}&resultsPerPage=5"
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json()
@@ -24,7 +24,7 @@ def get_nvd_cves(keywords, max_results=10):
                 #results.append({"cve": cve_id, "description": desc, "cvss": score, "lastModified": last_modified_date, "publication": published_date ,"source": "NVD", "reference": refs})
 
                 # Filtrer les CVEs publiées à partir d'hier
-                plage_date = datetime.now() - timedelta(days=15)
+                plage_date = datetime.now() - timedelta(days=5)
                 
                 # Ajouter un filtre pour ne garder que les publications à partir d'hier
                 if last_modified_date >= plage_date:
