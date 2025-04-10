@@ -1,78 +1,73 @@
 import streamlit as st
 import pandas as pd
-from utils.cert_fr import fetch_cert_fr_alerts
-from utils.nvd import fetch_nvd_alerts
-from utils.deduplicate import deduplicate_alerts
-from utils.storage import save_vulnerability_data, display_vulnerability_status
+import os
+from utils.certfr_scraper import get_certfr_alerts
+from utils.nvd_fetcher import get_nvd_cves
+from utils.vuln_filter import load_products, filter_vulns_by_products
 
-# Titre de l'application
-st.title("Cyberwatch - Outil de Veille Cybersécurité")
+st.set_page_config(page_title="Dashboard Vulnérabilités", layout="wide")
+st.title("🔐 Dashboard Vulnérabilités - CERT-FR & NVD")
 
-# Charger les alertes CERT-FR et NVD
-cert_fr_alerts = fetch_cert_fr_alerts()
-nvd_alerts = fetch_nvd_alerts()
+# Fichiers
+products_file = "infra_products.csv"
+tracking_file = "vuln_tracking.csv"
 
-# Fusionner les alertes et dédupliquer
-all_alerts = cert_fr_alerts + nvd_alerts
-vulns = deduplicate_alerts(all_alerts)
+# 1. Load products
+products = load_products(products_file)
+st.sidebar.header("📦 Produits surveillés")
+st.sidebar.write(products)
 
-# Convertir en DataFrame pour affichage
-#df_alerts = pd.DataFrame(unique_alerts)
+# 2. Fetch vulnerabilities
+with st.spinner("Chargement des vulnérabilités NVD..."):
+    nvd_vulns = get_nvd_cves(products, max_results=30)
+    relevant_nvd_vulns = filter_vulns_by_products(nvd_vulns, products)
 
-# Afficher les alertes dédupliquées
-#st.write("Voici les vulnérabilités collectées :")
-#st.dataframe(df_alerts)
+# 3. Chargement ou initialisation du fichier de suivi
+if os.path.exists(tracking_file):
+    tracking_df = pd.read_csv(tracking_file)
+else:
+    tracking_df = pd.DataFrame(columns=[
+        "cve", "description", "cvss", "source", "produit_impacté",
+        "impacté", "traité", "date_patch", "responsable"
+    ])
 
-# Sélectionner une vulnérabilité pour voir les détails
-#vuln_id = st.selectbox("Sélectionnez une vulnérabilité", df_alerts['title'])
-#vuln_details = df_alerts[df_alerts['title'] == vuln_id]
+# 4. Ajouter les nouvelles CVE au suivi si elles n’y sont pas
+for vuln in relevant_nvd_vulns:
+    if vuln["cve"] not in tracking_df["cve"].values:
+        new_row = {
+            "cve": vuln["cve"],
+            "description": vuln["description"],
+            "cvss": vuln["cvss"],
+            "source": vuln["source"],
+            "produit_impacté": "",
+            "impacté": "non",
+            "traité": "non",
+            "date_patch": "",
+            "responsable": ""
+        }
+        tracking_df = pd.concat([tracking_df, pd.DataFrame([new_row])], ignore_index=True)
 
-# Affichage des détails de la vulnérabilité sélectionnée
-#st.write("Détails de la vulnérabilité sélectionnée :")
-#st.write(vuln_details[['title', 'description', 'link']])
+# 5. Suivi interactif
+st.subheader("📋 Suivi des vulnérabilités")
+edited_df = tracking_df.copy()
 
-# Fonction pour interagir avec chaque vulnérabilité
-def show_vulnerabilities(vulns):
-    for vuln in vulns:
-        # Vérifier la présence des clés nécessaires
-        if not all(k in vuln for k in ("title", "description", "cve")):
-            st.warning(f"Vulnérabilité ignorée (incomplète) : {vuln}")
-            continue
+for i, row in tracking_df.iterrows():
+    with st.expander(f"{row['cve']} - {row['description'][:80]}..."):
+        edited_df.at[i, "produit_impacté"] = st.text_input("Produit concerné", row["produit_impacté"], key=f"prod_{i}")
+        edited_df.at[i, "impacté"] = st.selectbox("Impacté ?", ["oui", "non"], index=["oui", "non"].index(row["impacté"]), key=f"imp_{i}")
+        edited_df.at[i, "traité"] = st.selectbox("Traité ?", ["oui", "non"], index=["oui", "non"].index(row["traité"]), key=f"traite_{i}")
+        edited_df.at[i, "date_patch"] = st.date_input("Date de patch", pd.to_datetime(row["date_patch"]) if row["date_patch"] else None, key=f"date_{i})
+        edited_df.at[i, "responsable"] = st.text_input("Responsable", row["responsable"], key=f"resp_{i}")
 
-        st.write(f"**{vuln['title']}** - {vuln['description']}")
-        
-        impacted = st.radio(
-            f"Impacté par {vuln['title']} ?", ["Oui", "Non"],
-            key=f"impact_{vuln['cve']}"
-        )
+# 6. Sauvegarde
+if st.button("💾 Sauvegarder le suivi"):
+    edited_df.to_csv(tracking_file, index=False)
+    st.success("Suivi sauvegardé !")
 
-        if impacted == "Oui":
-            reason = st.text_area(
-                f"Raison pour {vuln['title']}",
-                "", key=f"reason_{vuln['cve']}"
-            )
-            mitigation_date = st.date_input(
-                f"Date de mitigation pour {vuln['title']}",
-                key=f"date_{vuln['cve']}"
-            )
-            responsible = st.text_input(
-                f"Responsable du service impacté par {vuln['title']}",
-                key=f"resp_{vuln['cve']}"
-            )
-
-            if st.button(f"Enregistrer {vuln['cve']}", key=f"btn_{vuln['cve']}"):
-                save_vulnerability_data(
-                    cve=vuln['cve'],
-                    impacted=impacted,
-                    reason=reason,
-                    mitigation_date=mitigation_date,
-                    responsible=responsible
-                )
-                st.success(f"Infos enregistrées pour {vuln['cve']}")
-
-
-# Afficher le formulaire de suivi
-show_vulnerabilities(cert_fr_alerts)
-
-# Afficher le tableau récapitulatif
-display_vulnerability_status()
+# 7. Affichage global + filtres
+st.subheader("📊 Tableau de suivi filtrable")
+filtre_statut = st.selectbox("Filtrer par statut traité", ["tous", "oui", "non"])
+if filtre_statut != "tous":
+    st.dataframe(edited_df[edited_df["traité"] == filtre_statut])
+else:
+    st.dataframe(edited_df)
