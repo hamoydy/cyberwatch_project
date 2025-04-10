@@ -56,7 +56,7 @@ for i, row in tracking_df.iterrows():
         edited_df.at[i, "produit_impacté"] = st.text_input("Produit concerné", row["produit_impacté"], key=f"prod_{i}")
         edited_df.at[i, "impacté"] = st.selectbox("Impacté ?", ["oui", "non"], index=["oui", "non"].index(row["impacté"]), key=f"imp_{i}")
         edited_df.at[i, "traité"] = st.selectbox("Traité ?", ["oui", "non"], index=["oui", "non"].index(row["traité"]), key=f"traite_{i}")
-        edited_df.at[i, "date_patch"] = st.date_input("Date de patch", pd.to_datetime(row["date_patch"]) if row["date_patch"] else None, key=f"date_{i})
+        edited_df.at[i, "date_patch"] = st.date_input("Date de patch", pd.to_datetime(row["date_patch"]) if row["date_patch"] else None, key=f"date_{i}")
         edited_df.at[i, "responsable"] = st.text_input("Responsable", row["responsable"], key=f"resp_{i}")
 
 # 6. Sauvegarde
