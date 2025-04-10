@@ -2,7 +2,7 @@ import requests
 from datetime import datetime, timedelta
 import pandas as pd
 
-def get_nvd_cves(keywords, max_results=20):
+def get_nvd_cves(keywords, max_results=10):
     results = []
     for keyword in keywords:
         url = f"https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch={keyword}&resultsPerPage=10"
