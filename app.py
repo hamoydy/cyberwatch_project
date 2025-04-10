@@ -19,7 +19,7 @@ st.sidebar.write(products)
 
 # 2. Fetch vulnerabilities
 with st.spinner("Chargement des vulnérabilités NVD..."):
-    nvd_vulns = get_nvd_cves(products, max_results=10)
+    nvd_vulns = get_nvd_cves(products, max_results=5)
     relevant_nvd_vulns = filter_vulns_by_products(nvd_vulns, products)
 
 # 3. Chargement ou initialisation du fichier de suivi
