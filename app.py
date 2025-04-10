@@ -34,18 +34,42 @@ vulns = deduplicate_alerts(all_alerts)
 # Fonction pour interagir avec chaque vulnérabilité
 def show_vulnerabilities(vulns):
     for vuln in vulns:
+        # Vérifier la présence des clés nécessaires
+        if not all(k in vuln for k in ("title", "description", "cve")):
+            st.warning(f"Vulnérabilité ignorée (incomplète) : {vuln}")
+            continue
+
         st.write(f"**{vuln['title']}** - {vuln['description']}")
-        impacted = st.radio(f"Impacté par {vuln['title']} ?", ["Oui", "Non"], key=vuln['cve'])
         
+        impacted = st.radio(
+            f"Impacté par {vuln['title']} ?", ["Oui", "Non"],
+            key=f"impact_{vuln['cve']}"
+        )
+
         if impacted == "Oui":
-            reason = st.text_area(f"Raison pour {vuln['title']}", "", key=f"reason_{vuln['cve']}")
-            mitigation_date = st.date_input(f"Date de mitigation pour {vuln['title']}", min_value=datetime.today().date(), key=f"mitigation_date_{vuln['cve']}")
-            responsible_person = st.text_input(f"Personne responsable de la mitigation de {vuln['title']}", key=f"responsible_{vuln['cve']}")
-            
-            if st.button(f"Enregistrer pour {vuln['title']}", key=f"submit_{vuln['cve']}"):
-                # Enregistrer les données
-                save_vulnerability_data(vuln['cve'], impacted, reason, mitigation_date, responsible_person)
-                st.success(f"Informations enregistrées pour {vuln['title']}")
+            reason = st.text_area(
+                f"Raison pour {vuln['title']}",
+                "", key=f"reason_{vuln['cve']}"
+            )
+            mitigation_date = st.date_input(
+                f"Date de mitigation pour {vuln['title']}",
+                key=f"date_{vuln['cve']}"
+            )
+            responsible = st.text_input(
+                f"Responsable du service impacté par {vuln['title']}",
+                key=f"resp_{vuln['cve']}"
+            )
+
+            if st.button(f"Enregistrer {vuln['cve']}", key=f"btn_{vuln['cve']}"):
+                save_vulnerability_data(
+                    cve=vuln['cve'],
+                    impacted=impacted,
+                    reason=reason,
+                    mitigation_date=mitigation_date,
+                    responsible=responsible
+                )
+                st.success(f"Infos enregistrées pour {vuln['cve']}")
+
 
 # Afficher le formulaire de suivi
 show_vulnerabilities(vulns)
